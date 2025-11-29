@@ -7,29 +7,15 @@
 //You should handle all possible errors so that the application never crashes.
 //You can only interact with the database using ADO.NET.You can’t use mappers such as Entity Framework or Dapper.
 //Follow the DRY Principle, and avoid code repetition.
-//Your project needs to contain a Read Me file where you'll explain how your app works. Here's a nice example:
+//Your project needs to contain a Read Me file where you'll explain how your app works.
 
 using HabitTrackerProgram.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using var db = new HabitContext();
-
-//Habit habit = new();
-//habit.Description = "Read";
-//habit.Date = DateOnly.FromDateTime(System.DateTime.Now);
-//habit.Quantity = 1;
-
-//Console.WriteLine($"My habit: {habit}");
-
-//db.Add(habit);
-//await db.SaveChangesAsync();
-
-//habit = await db.Habit.OrderBy(h => h.Id).FirstOrDefaultAsync() ?? throw new Exception("No habit available");
 
 while (true)
 {
-    PrintMainMenu();
+    MainMenuScreen();
     var op = Console.ReadKey().KeyChar;
     switch (op)
     {
@@ -37,21 +23,97 @@ while (true)
             List<Habit> habits = await db.Habit.ToListAsync();
             PrintHabits(habits);
             break;
-        case '2':
-            AddHabit();
+        case '2': //Add
+            AddHabitScreen();
             break;
-        case '3':
+        case '3': // Edit
+            EditHabitScreen();
             break;
-        case '4':
+        case '4': // Delete
+            DeleteHabitScreen();
             break;
         case 'q':
             Environment.Exit(0);
             break;
         default:
-            Console.WriteLine("Unrecognized input, please try again");
+            Console.Write("Unrecognized input, please try again: ");
             break;
     }
+}
 
+async void EditHabitScreen()
+{
+    Console.WriteLine("\nPlease type the Id of the habit you want to edit (integer): ");
+    int id;
+    while (!int.TryParse(Console.ReadLine(), out id))
+    {
+        Console.WriteLine("Invalid input, try again: ");
+    }
+
+    Habit? h = await db.Habit.FindAsync(id);
+    if (h is null)
+    {
+        Console.WriteLine("Habit not found. Go back to the main menu and think about what you just did!");
+        return;
+    }
+    else
+    {
+        bool isDone = false;
+        while (!isDone)
+        {
+            Console.WriteLine("\n----- EDIT MENU -----");
+            Console.WriteLine("[1] - Edit Description");
+            Console.WriteLine("[2] - Edit Date");
+            Console.WriteLine("[3] - Edit Quantity");
+            Console.WriteLine("[P] - Print current habit");
+            Console.WriteLine("[D] - Done with editing");
+
+            var input = Console.ReadKey().KeyChar;
+            switch (input)
+            {
+                case '1':
+                    Console.Write("\nType the new description: ");
+                    h.Description = Console.ReadLine() ?? "";
+                    break;
+                case '2':
+                    Console.Write("\nType the new date: ");
+                    h.Date = ReadDate();
+                    break;
+                case '3':
+                    Console.Write("\nType the new quantity: ");
+                    h.Quantity = ReadInt();
+                    break;
+                case 'p':
+                    PrintHabits([h]);
+                    break;
+                case 'd':
+                    isDone = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    try
+    {
+        db.Habit.Update(h);
+        await db.SaveChangesAsync();
+    }
+    catch (Exception)
+    {
+        Console.WriteLine("Something Went Wrong, please try again.");
+    }
+}
+
+static int ReadInt(string messageIfInvalid="\nInvalid integer, please try again: ")
+{
+    int input;
+    while (!int.TryParse(Console.ReadLine(), out input))
+    {
+        Console.Write(messageIfInvalid);
+    }
+    return input;
 }
 
 static bool ParseDate(string? strDate, out DateOnly date)
@@ -69,57 +131,88 @@ static bool ParseDate(string? strDate, out DateOnly date)
     return true;
 }
 
-async void AddHabit()
+static DateOnly ReadDate(string messageIfInvalid= "\nInvalid date, please try again: ")
 {
-    Habit habit = new();
-
-    Console.Write("Type the habit description: ");
-    habit.Description = Console.ReadLine() ?? "";
-
-    Console.Write("\nHabit date (leave blank for today): ");
     DateOnly date;
     while (!ParseDate(Console.ReadLine(), out date))
     {
-        Console.Write("\nInvalid date. Try again: ");
+        Console.Write(messageIfInvalid);
     }
-
-    habit.Date = date;
-    Console.Write("\nHow much you achieved (quantity): ");
-    int input;
-    while (!int.TryParse(Console.ReadLine(), out input))
-    {
-        Console.Write("\nInvalid quantity: ");
-    }
-    habit.Quantity = input;
-
-    await db.Habit.AddAsync(habit);
-    await db.SaveChangesAsync();
+    return date;
 }
 
-static void PrintMainMenu()
+// Ideally I'd avoid printing and doing business logic inside the same function
+// but since this is a small project I don't see a problem,
+// refactoring this should be straightforward should the need arise.
+async void AddHabitScreen()
+{
+    Habit habit = new();
+
+    Console.Write("\nType the habit description: ");
+    habit.Description = Console.ReadLine() ?? "";
+
+    Console.Write("\nHabit date (leave blank for today): ");
+    habit.Date = ReadDate("\nInvalid date. Try again: ");
+
+    Console.Write("\nHow much you achieved (quantity): ");
+    habit.Quantity = ReadInt("\nInvalid integer, please try again");
+
+    try
+    {
+        await db.Habit.AddAsync(habit);
+        await db.SaveChangesAsync();
+    }
+    catch (Exception)
+    {
+        Console.WriteLine("Something Went Wrong, please try again.");
+    }
+}
+
+async void DeleteHabitScreen()
+{
+    Console.Write("\nPlease type the Id (integer) of the habit to be deleted: ");
+    int input = ReadInt("\nInvalid Input, please try again");
+
+    Habit? habit = db.Habit.Find(input);
+    if (habit is null) Console.WriteLine("Habit not found. Nothing was deleted. Going back to Main Menu.");
+    else
+    {
+        try
+        {
+            db.Habit.Remove(habit);
+            await db.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Something went wrong, please try again.");
+        }
+    }
+}
+
+static void MainMenuScreen()
 {
     Console.WriteLine("\n----- MAIN MENU -----");
     Console.WriteLine("[1] - Show all habit records");
     Console.WriteLine("[2] - Add habit");
     Console.WriteLine("[3] - Edit habit");
-    Console.WriteLine("[4] - Remove habit by ID");
+    Console.WriteLine("[4] - Remove habit by Id");
     Console.WriteLine("[Q] - Quit application");
-    Console.Write("   ");
 }
 
 void PrintHabits(List<Habit> habits)
 {
+    Console.WriteLine("\n----- Habit History -----\n");
     if (habits.Count == 0)
     {
-        Console.WriteLine("Nothing to display");
+        Console.WriteLine("\nNothing to display");
     }
     else
     {
         foreach (var h in habits)
         {
-            Console.Write($"ID: {h.Id} \t\tDate added: {h.Date}");
-            Console.Write($"Description: {h.Description}");
-            Console.Write($"Quantity: {h.Quantity}");
+            Console.WriteLine($"ID: {h.Id} \t\t\tDate added: {h.Date}");
+            Console.WriteLine($"Description: {h.Description}");
+            Console.WriteLine($"Quantity: {h.Quantity}\n");
         }
     }
 }
