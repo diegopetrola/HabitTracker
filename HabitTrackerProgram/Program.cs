@@ -6,19 +6,15 @@
 //The users should be able to insert, delete, update and view their logged habit.
 //You should handle all possible errors so that the application never crashes.
 //You can only interact with the database using ADO.NET.You can’t use mappers such as Entity Framework or Dapper.
-//Follow the DRY Principle, and avoid code repetition.
 //Your project needs to contain a Read Me file where you'll explain how your app works.
 
 // Minor concerns:
 // Code was done using EntityFrameworkCore
-// db has a delay
-// Console.WriteLine("Something Went Wrong, please try again.") appears too much
 // the "Screen" functions are dealing with business logic
 
 
 using HabitTrackerProgram.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using var db = new HabitContext();
 
 CustomSeeding(100);
@@ -204,22 +200,26 @@ async void AddHabitScreen()
     }
 
     Habit habit = new();
-    var types = await db.HabitType.ToListAsync();
 
-    Console.Write("\nHabit date (leave blank for today, negative number to subtract days from today): ");
-    habit.Date = ReadDate("\nInvalid date. Try again: ");
+    Console.Write("\nPlease select the ID of the type of habit you want to add: ");
+    ListHabitTypeScreen();
+    HabitType? hType = null;
+    while(true)
+    {
+        int hTypeId = ReadInt();
+        hType = habitTypes.Find(h => h.Id == hTypeId);
+        if (hType is null)
+            Console.Write("\nPlease type the Id of a valid habit: ");
+        else
+            break;
+    }
+    habit.HabitTypeId = hType.Id;
 
-    Console.Write("How much you achieved (quantity): ");
+    Console.Write($"How much you achieved in {hType.UnityName}: ");
     habit.Quantity = ReadInt("\nInvalid integer, please try again");
 
-    Console.Write("Please select the ID of the type of habit you want to add: ");
-    ListHabitTypeScreen();
-    int hTypeId = ReadInt();
-    while (!habitTypes.Any(h => h.Id == hTypeId)) {
-        Console.WriteLine("Type the Id of a valid habit");
-        hTypeId = ReadInt();
-    }
-    habit.HabitTypeId = hTypeId;
+    Console.Write("Habit date (leave blank for today, negative number to subtract days from today): ");
+    habit.Date = ReadDate("\nInvalid date. Try again: ");
 
     try
     {
