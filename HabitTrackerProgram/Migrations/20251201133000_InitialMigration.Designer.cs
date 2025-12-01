@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HabitTrackerProgram.Migrations
 {
     [DbContext(typeof(HabitContext))]
-    [Migration("20251201050203_initial migration")]
-    partial class initialmigration
+    [Migration("20251201133000_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
