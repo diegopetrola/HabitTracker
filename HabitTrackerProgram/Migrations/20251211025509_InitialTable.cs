@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HabitTrackerProgram.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,10 +53,10 @@ namespace HabitTrackerProgram.Migrations
                 columns: new[] { "Id", "Name", "UnityName" },
                 values: new object[,]
                 {
-                    { -4, "Exercising", "Minutes" },
-                    { -3, "Reading", "Books" },
-                    { -2, "Eating", "KCal" },
-                    { -1, "Running", "Km" }
+                    { 1, "Running", "Km" },
+                    { 2, "Eating", "KCal" },
+                    { 3, "Reading", "Books" },
+                    { 4, "Exercising", "Minutes" }
                 });
 
             migrationBuilder.CreateIndex(

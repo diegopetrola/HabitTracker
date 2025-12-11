@@ -2,6 +2,11 @@
 
 This is a program that tracks the occurrencies of habits and offer insights such as average and counting of occurrence and filter by date. The data is saved in a local MySQL database to offer persitence.
 
+## Installation
+
+- Clone the repository: `https://github.com/diegopetrola/HabitTracker`
+-
+
 ## Notes on Usage
 
 You can add habits but, for that, you need to have HabitTypes registered. For instance, if you want to track how much you are running in Km, you need to register a habit type of Running with unity of Km. After that you can add habits of type Km.

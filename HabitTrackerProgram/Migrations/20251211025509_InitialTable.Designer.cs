@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HabitTrackerProgram.Migrations
 {
     [DbContext(typeof(HabitContext))]
-    [Migration("20251201133000_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251211025509_InitialTable")]
+    partial class InitialTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,25 +63,25 @@ namespace HabitTrackerProgram.Migrations
                     b.HasData(
                         new
                         {
-                            Id = -1,
+                            Id = 1,
                             Name = "Running",
                             UnityName = "Km"
                         },
                         new
                         {
-                            Id = -2,
+                            Id = 2,
                             Name = "Eating",
                             UnityName = "KCal"
                         },
                         new
                         {
-                            Id = -3,
+                            Id = 3,
                             Name = "Reading",
                             UnityName = "Books"
                         },
                         new
                         {
-                            Id = -4,
+                            Id = 4,
                             Name = "Exercising",
                             UnityName = "Minutes"
                         });

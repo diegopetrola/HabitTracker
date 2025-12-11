@@ -10,8 +10,7 @@ public class HabitContext : DbContext
 
     public HabitContext()
     {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
+        var path = Environment.CurrentDirectory;
         DbPath = System.IO.Path.Join(path, "habit.db");
     }
 
@@ -20,10 +19,10 @@ public class HabitContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         List<HabitType> defaultTypes = new List<HabitType> {
-            new HabitType { Id = -1, Name = "Running", UnityName = "Km" },
-            new HabitType { Id = -2, Name = "Eating", UnityName = "KCal" },
-            new HabitType { Id = -3, Name = "Reading", UnityName = "Books" },
-            new HabitType { Id = -4, Name = "Exercising", UnityName = "Minutes" }
+            new HabitType { Id = 1, Name = "Running", UnityName = "Km" },
+            new HabitType { Id = 2, Name = "Eating", UnityName = "KCal" },
+            new HabitType { Id = 3, Name = "Reading", UnityName = "Books" },
+            new HabitType { Id = 4, Name = "Exercising", UnityName = "Minutes" }
         };
 
         modelBuilder.Entity<HabitType>().HasData(defaultTypes);

@@ -20,13 +20,19 @@ while (true)
             DeleteHabitScreen();
             break;
         case '4':
-            ListHabitTypeScreen();
+            EditHabitScreen();
             break;
         case '5':
-            AddHabitTypeScreen();
+            ListHabitTypeScreen();
             break;
         case '6':
+            AddHabitTypeScreen();
+            break;
+        case '7':
             DeleteHabitTypeScreen();
+            break;
+        case '8':
+            EditHabitTypeScreen();
             break;
         case 'q':
             Environment.Exit(0);
@@ -240,6 +246,34 @@ async void DeleteHabitScreen()
     }
 }
 
+async void EditHabitScreen()
+{
+    Console.Write("\nPlease type the Id (integer) of the habit to be edited: ");
+    int input = ReadInt("\nInvalid Input, please try again");
+
+    Habit? habit = db.Habit.Find(input);
+    if (habit is null) Console.WriteLine("Habit not found. Nothing was deleted. Going back to Main Menu.");
+    else
+    {
+        Console.WriteLine("Please type the new date (leave empty for no change): ");
+        habit.Date = ReadDate();
+
+        Console.WriteLine("Please type the new quantity (leave empty for no change): ");
+        habit.Quantity = ReadInt();
+        
+        try
+        {
+            db.Habit.Update(habit);
+            await db.SaveChangesAsync();
+            Console.WriteLine("Edit successful.");
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Something went wrong, please try again.");
+        }
+    }
+}
+
 async void AddHabitTypeScreen()
 {
     HabitType ht = new();
@@ -262,13 +296,20 @@ async void AddHabitTypeScreen()
 static void MainMenuScreen()
 {
     Console.WriteLine("\n----- MAIN MENU -----");
-    Console.WriteLine("[1] - Show habits");
-    Console.WriteLine("[2] - Add habit");
-    Console.WriteLine("[3] - Remove habit by Id");
-    Console.WriteLine("[4] - Show habit types");
-    Console.WriteLine("[5] - Add habit type");
-    Console.WriteLine("[6] - Remove habit type by Id");
-    Console.WriteLine("[Q] - Quit application");
+    Console.WriteLine();
+    Console.WriteLine("  --- HABIT OPTIONS ---");
+    Console.WriteLine("  [1] - Show habits");
+    Console.WriteLine("  [2] - Add habit");
+    Console.WriteLine("  [3] - Remove habit by Id");
+    Console.WriteLine("  [4] - Edit habit by Id");
+    Console.WriteLine();
+    Console.WriteLine("  --- HABIT TYPE OPTIONS ---");
+    Console.WriteLine("  [5] - Show habit types");
+    Console.WriteLine("  [6] - Add habit type");
+    Console.WriteLine("  [7] - Remove habit type by Id");
+    Console.WriteLine("  [8] - Edit habit type by Id");
+    Console.WriteLine();
+    Console.WriteLine("  [Q] - Quit application");
 }
 
 async void PrintHabitsByDate(DateOnly startDate, DateOnly endDate)
@@ -313,6 +354,38 @@ async void DeleteHabitTypeScreen()
         db.HabitType.Remove(habit);
         await db.SaveChangesAsync();
         Console.WriteLine("Deleteion sucessful");
+    }
+    catch (Exception)
+    {
+        Console.WriteLine("Something went wrong, please try again.");
+    }
+}
+
+async void EditHabitTypeScreen()
+{
+    Console.WriteLine("\nType the Id of the HabitType you want to edit: ");
+    int input = ReadInt();
+
+    var habit = await db.HabitType.FirstOrDefaultAsync(h => h.Id == input);
+
+    if (habit is null)
+    {
+        Console.WriteLine("\nNo habit found");
+        return;
+    }
+    Console.WriteLine("\nType the new name (leave empty for no change): ");
+    string name = Console.ReadLine() ?? "";
+    habit.Name = name == "" ? habit.Name : name;
+
+    Console.WriteLine("\nType the new unity of measurement (leave empty for no change): ");
+    string unity = Console.ReadLine() ?? "";
+    habit.UnityName = unity == "" ? habit.Name : name;
+
+    try
+    {
+        db.HabitType.Update(habit);
+        await db.SaveChangesAsync();
+        Console.WriteLine("Edit sucessful");
     }
     catch (Exception)
     {

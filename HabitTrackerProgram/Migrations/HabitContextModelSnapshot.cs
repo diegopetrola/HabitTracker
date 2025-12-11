@@ -60,25 +60,25 @@ namespace HabitTrackerProgram.Migrations
                     b.HasData(
                         new
                         {
-                            Id = -1,
+                            Id = 1,
                             Name = "Running",
                             UnityName = "Km"
                         },
                         new
                         {
-                            Id = -2,
+                            Id = 2,
                             Name = "Eating",
                             UnityName = "KCal"
                         },
                         new
                         {
-                            Id = -3,
+                            Id = 3,
                             Name = "Reading",
                             UnityName = "Books"
                         },
                         new
                         {
-                            Id = -4,
+                            Id = 4,
                             Name = "Exercising",
                             UnityName = "Minutes"
                         });
