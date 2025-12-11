@@ -4,8 +4,8 @@ This is a program that tracks the occurrencies of habits and offer insights such
 
 ## Installation
 
-- Clone the repository: `https://github.com/diegopetrola/HabitTracker`
--
+- Clone the repository: `https://github.com/diegopetrola/HabitTracker` && cd HabitTracker/HabitTrackerProgram
+- Run the project: `dotnet run`
 
 ## Notes on Usage
 
